@@ -1,0 +1,59 @@
+*.cproject
+*.project
+/*/bin/**
+
+#CodeBlocks
+*.depend
+*.layout
+*/*/bin/*
+*/*/obj/*
+*/*/.objs/*
+2013/software/IGVC2013_build_log.html
+
+#ArdupilotIgnores
+/2013/software/src/sensors/ardupilot/config.mk
+/src/hardware/sensors/ardupilot/config.mk
+/sandbox/ardupilot/config.mk
+
+*~
+*.swp
+
+#Qt Creator
+*.pro.user*
+#ignores all top-level directories whose name starts with "build". This ignores the default Qt build directory formatting for projects.
+/build*
+*.user
+
+#Doxygen
+/docs/
+
+#rosdoc_lite
+/doc/
+
+#Speed_compare
+/sandbox/speed_comapare/speed_data.csv
+
+#JetBrains Clion
+*/.idea/
+/.idea/
+
+#VSCode
+.vscode
+
+# CMake
+*/cmake-build-*/
+
+#Camera Calibration
+/sandbox/camera_pose_estimation/CMakeFiles
+/sandbox/camera_pose_estimation/CMakeCache.txt
+/sandbox/camera_pose_estimation/cmake_install.cmake
+/sandbox/camera_pose_estimation/Makefile
+/sandbox/camera_pose_estimation/solvepnp
+
+#CNN models
+/sandbox/models/
+
+#generated textures
+/igvc_gazebo/scripts/gen
+#pyc
+*.pyc
