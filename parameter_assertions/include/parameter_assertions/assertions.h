@@ -1,30 +1,28 @@
 #ifndef SRC_ASSERTIONS_H
 #define SRC_ASSERTIONS_H
 
-#include <type_traits>
 #include <ros/ros.h>
+#include <type_traits>
+#include <parameter_assertions/type_traits.h>
 
 namespace assertions
 {
-template <bool B, typename T = void>
-using disable_if = std::enable_if<!B, T>;
-
-template <bool B, class T = void>
-using enable_if_t = typename std::enable_if<B, T>::type;
-
-template <typename T>
-struct is_vector : public std::false_type
+enum class NumberAssertionType
 {
-};
-
-template <typename T, typename A>
-struct is_vector<std::vector<T, A>> : public std::true_type
-{
+  POSITIVE,
+  NEGATIVE,
+  NON_NEGATIVE,
+  NON_POSITIVE,
+  LESS_THAN_EQ_ONE,
+  ABS_LESS_THAN_EQ_ONE,
 };
 
 class Asserter
 {
- public:
+public:
+  template <typename T>
+  using AssertionFP = typename std::add_pointer<bool(const T&)>::type;
+
   /**
    * Class for performing paramter assertions.
    *
@@ -44,7 +42,7 @@ class Asserter
    * @return
    */
   template <typename T>
-  bool param(const ros::NodeHandle& nh, const std::string& param_name, T& param_val, const T& default_val) const;
+  bool param(const ros::NodeHandle& nh, const std::string& param_name, T& param_var, const T& default_val) const;
 
   /**
    * Calls nh.param with the passed in values. Logs with ROS_WARN_STREAM if the default value is used. Returns the
@@ -56,7 +54,7 @@ class Asserter
    * @param default_val
    * @return
    */
-  template<typename T>
+  template <typename T>
   [[nodiscard]] T param(const ros::NodeHandle& nh, const std::string& param_name, const T& default_val) const;
 
   /**
@@ -69,19 +67,38 @@ class Asserter
    * @param param_val
    */
   template <typename T>
-  void getParam(const ros::NodeHandle& nh, const std::string& param_name, T& param_val) const;
+  bool getParam(const ros::NodeHandle& nh, const std::string& param_name, T& param_var) const;
 
- private:
-  template <typename T, typename disable_if<is_vector<T>::value, T>::type* = nullptr>
-  void warnDefaultWithMessage(const std::string& node_namespace, const std::string& variable_name,
-                              const T& variable, const std::string& message) const;
+  template <typename T, typename std::enable_if<type_traits::is_number<T>::value, T>::type* = nullptr>
+  bool getParam(const ros::NodeHandle& nh, const std::string& param_name, T& param_var,
+                std::vector<NumberAssertionType> assertions) const;
 
-  template <typename V,typename std::enable_if<is_vector<V>::value, V>::type* = nullptr>
-  void warnDefaultWithMessage(const std::string& node_namespace, const std::string& variable_name,
-                              const V& variable, const std::string& message) const;
+  template <typename T, typename type_traits::disable_if<type_traits::is_number<T>::value, T>::type* = nullptr>
+  bool getParam(const ros::NodeHandle& nh, const std::string& param_name, T& param_var,
+                std::vector<NumberAssertionType> assertions) const;
+
+private:
+  template <typename T, typename type_traits::disable_if<type_traits::is_vector<T>::value, T>::type* = nullptr>
+  void warnDefaultWithMessage(const std::string& node_namespace, const std::string& variable_name, const T& variable,
+                              const std::string& message) const;
+
+  template <typename V, typename std::enable_if<type_traits::is_vector<V>::value, V>::type* = nullptr>
+  void warnDefaultWithMessage(const std::string& node_namespace, const std::string& variable_name, const V& variable,
+                              const std::string& message) const;
+
+  template <typename T, typename type_traits::disable_if<type_traits::is_vector<T>::value, T>::type* = nullptr>
+  bool passesAssertion(const T& variable, std::vector<NumberAssertionType> assertions) const;
+
+  template <typename V, typename std::enable_if<type_traits::is_vector<V>::value, V>::type* = nullptr>
+  bool passesAssertion(const V& variable, std::vector<NumberAssertionType> assertions) const;
+
+  template <typename T>
+  AssertionFP<T> getAssertionFunction(NumberAssertionType assertion_type) const;
+
+  void fail() const;
 
   bool exit_on_failure_;
 };
-}
+}  // namespace assertions
 
-#endif //SRC_ASSERTIONS_H
+#endif  // SRC_ASSERTIONS_H

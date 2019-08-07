@@ -67,6 +67,18 @@ protected:
     }                                                                                                                  \
   } while (false)
 
+#define EXPECT_ROS_ALIVE()                                                                                             \
+  do                                                                                                                   \
+  {                                                                                                                    \
+    EXPECT_FALSE(ros::isShuttingDown());                                                                               \
+  } while (false)
+
+#define EXPECT_ROS_DEAD()                                                                                              \
+  do                                                                                                                   \
+  {                                                                                                                    \
+    EXPECT_TRUE(ros::isShuttingDown());                                                                                \
+  } while (false)
+
 //========== Basic Functionality ==========
 TEST_F(TestAssertions, getParamGetsParamString)
 {
@@ -189,35 +201,35 @@ TEST_F(TestAssertions, getParamEnsuresParamIsSetString)
 {
   std::string param;
   asserter_.getParam(handle_, parameter1, param);
-  EXPECT_TRUE(ros::isShuttingDown());
+  EXPECT_ROS_DEAD();
 }
 
 TEST_F(TestAssertions, getParamEnsuresParamIsSetDouble)
 {
   double param;
   asserter_.getParam(handle_, parameter1, param);
-  EXPECT_TRUE(ros::isShuttingDown());
+  EXPECT_ROS_DEAD();
 }
 
 TEST_F(TestAssertions, getParamEnsuresParamIsSetFloat)
 {
   float param;
   asserter_.getParam(handle_, parameter1, param);
-  EXPECT_TRUE(ros::isShuttingDown());
+  EXPECT_ROS_DEAD();
 }
 
 TEST_F(TestAssertions, getParamEnsuresParamIsSetInt)
 {
   int param;
   asserter_.getParam(handle_, parameter1, param);
-  EXPECT_TRUE(ros::isShuttingDown());
+  EXPECT_ROS_DEAD();
 }
 
 TEST_F(TestAssertions, getParamEnsuresParamIsSetBool)
 {
   bool param;
   asserter_.getParam(handle_, parameter1, param);
-  EXPECT_TRUE(ros::isShuttingDown());
+  EXPECT_ROS_DEAD();
 }
 
 //========== param uses default value and doesn't shutdown ==========
@@ -285,6 +297,124 @@ TEST_F(TestAssertions, paramUsesDefaultValueInt)
     auto result = asserter_.param(handle_, parameter2, default_param);
     EXPECT_VEC_EQ(result, default_param);
   }
+}
+
+// ===========================
+// = Test Positive assertion =
+// ===========================
+
+TEST_F(TestAssertions, getParamAssertNumberPositivePass)
+{
+  {
+    double param;
+    double set_param = 40.02;
+    handle_.setParam(parameter1, set_param);
+    asserter_.getParam(handle_, parameter1, param, { assertions::NumberAssertionType::POSITIVE });
+    EXPECT_FLOAT_EQ(param, set_param);
+    EXPECT_ROS_ALIVE();
+  }
+  {
+    float param;
+    float set_param = 82.1f;
+    handle_.setParam(parameter2, set_param);
+    asserter_.getParam(handle_, parameter2, param, { assertions::NumberAssertionType::POSITIVE });
+    EXPECT_FLOAT_EQ(param, set_param);
+    EXPECT_ROS_ALIVE();
+  }
+  {
+    int param;
+    int set_param = 150;
+    handle_.setParam(parameter3, set_param);
+    asserter_.getParam(handle_, parameter3, param, { assertions::NumberAssertionType::POSITIVE });
+    EXPECT_EQ(param, set_param);
+    EXPECT_ROS_ALIVE();
+  }
+}
+
+TEST_F(TestAssertions, getParamAssertNumberPositiveFailDouble)
+{
+  double param;
+  double set_param = -91.312;
+  handle_.setParam(parameter1, set_param);
+  asserter_.getParam(handle_, parameter1, param, { assertions::NumberAssertionType::POSITIVE });
+  EXPECT_ROS_DEAD();
+}
+
+TEST_F(TestAssertions, getParamAssertNumberPositiveFailFloat)
+{
+  float param;
+  float set_param = -91.312;
+  handle_.setParam(parameter1, set_param);
+  asserter_.getParam(handle_, parameter1, param, { assertions::NumberAssertionType::POSITIVE });
+  EXPECT_ROS_DEAD();
+}
+
+TEST_F(TestAssertions, getParamAssertNumberPositiveFailInt)
+{
+  int param;
+  int set_param = -32131;
+  handle_.setParam(parameter1, set_param);
+  asserter_.getParam(handle_, parameter1, param, { assertions::NumberAssertionType::POSITIVE });
+  EXPECT_ROS_DEAD();
+}
+
+// ===============================
+// = Test Non-negative assertion =
+// ===============================
+
+TEST_F(TestAssertions, getParamAssertNumberNonNegativePass)
+{
+  {
+    double param;
+    double set_param = 0.0;
+    handle_.setParam(parameter1, set_param);
+    asserter_.getParam(handle_, parameter1, param, { assertions::NumberAssertionType::NON_NEGATIVE });
+    EXPECT_FLOAT_EQ(param, set_param);
+    EXPECT_ROS_ALIVE();
+  }
+  {
+    float param;
+    float set_param = 0.1f;
+    handle_.setParam(parameter2, set_param);
+    asserter_.getParam(handle_, parameter2, param, { assertions::NumberAssertionType::NON_NEGATIVE });
+    EXPECT_FLOAT_EQ(param, set_param);
+    EXPECT_ROS_ALIVE();
+  }
+  {
+    int param;
+    int set_param = 0;
+    handle_.setParam(parameter3, set_param);
+    asserter_.getParam(handle_, parameter3, param, { assertions::NumberAssertionType::NON_NEGATIVE });
+    EXPECT_EQ(param, set_param);
+    EXPECT_ROS_ALIVE();
+  }
+}
+
+TEST_F(TestAssertions, getParamAssertNumberNonNegativeFailDouble)
+{
+  double param;
+  double set_param = -91.312;
+  handle_.setParam(parameter1, set_param);
+  asserter_.getParam(handle_, parameter1, param, { assertions::NumberAssertionType::NON_NEGATIVE });
+  EXPECT_ROS_DEAD();
+}
+
+TEST_F(TestAssertions, getParamAssertNumberNonNegativeFailFloat)
+{
+  float param;
+  float set_param = -91.312;
+  handle_.setParam(parameter1, set_param);
+  asserter_.getParam(handle_, parameter1, param, { assertions::NumberAssertionType::NON_NEGATIVE });
+  EXPECT_ROS_DEAD();
+}
+
+TEST_F(TestAssertions, getParamAssertNumberNonNegativeFailInt)
+{
+  int param;
+  int set_param = -32131;
+  handle_.setParam(parameter1, set_param);
+  asserter_.getParam(handle_, parameter1, param, { assertions::NumberAssertionType::NON_NEGATIVE });
+  EXPECT_ROS_DEAD();
 }
 
 int main(int argc, char** argv)
