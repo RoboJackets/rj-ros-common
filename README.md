@@ -1,4 +1,4 @@
-# RoboJackets ROS Common
+# RoboJackets ROS Common [![Build Status](https://circleci.com/gh/RoboJackets/rj-ros-common/tree/master.svg?&style=shield)](https://circleci.com/gh/RoboJackets/rj-ros-common/tree/master)
 
 Welcome to the RoboJackets ROS common library.
 
