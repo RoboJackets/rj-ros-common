@@ -1,9 +1,9 @@
 #ifndef SRC_ASSERTIONS_H
 #define SRC_ASSERTIONS_H
 
+#include <parameter_assertions/type_traits.h>
 #include <ros/ros.h>
 #include <type_traits>
-#include <parameter_assertions/type_traits.h>
 
 namespace assertions
 {

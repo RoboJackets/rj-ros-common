@@ -39,6 +39,6 @@ struct is_number<int> : public std::true_type
 {
 };
 
-}  // namespace type_traits
+}  // namespace assertions::type_traits
 
-#endif //SRC_TYPE_TRAITS_H
+#endif  // SRC_TYPE_TRAITS_H

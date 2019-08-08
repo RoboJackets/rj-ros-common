@@ -3,7 +3,8 @@
 namespace assertions
 {
 Asserter::Asserter(bool exit_on_failure) noexcept : exit_on_failure_{ exit_on_failure }
-{}
+{
+}
 
 template <typename T, typename type_traits::disable_if<type_traits::is_vector<T>::value, T>::type*>
 void Asserter::warnDefaultWithMessage(const std::string& node_namespace, const std::string& variable_name,
@@ -13,9 +14,9 @@ void Asserter::warnDefaultWithMessage(const std::string& node_namespace, const s
                       << variable);
 }
 
-template <typename V,typename std::enable_if<type_traits::is_vector<V>::value, V>::type*>
+template <typename V, typename std::enable_if<type_traits::is_vector<V>::value, V>::type*>
 void Asserter::warnDefaultWithMessage(const std::string& node_namespace, const std::string& variable_name,
-                            const V& variable, const std::string& message) const
+                                      const V& variable, const std::string& message) const
 {
   std::stringstream ss;
 
@@ -45,7 +46,7 @@ bool Asserter::param(const ros::NodeHandle& nh, const std::string& param_name, T
   return true;
 }
 
-template<typename T>
+template <typename T>
 T Asserter::param(const ros::NodeHandle& nh, const std::string& param_name, const T& default_val) const
 {
   T param_var;
@@ -64,7 +65,7 @@ bool Asserter::getParam(const ros::NodeHandle& nh, const std::string& param_name
 
 template <typename T, typename std::enable_if<type_traits::is_number<T>::value, T>::type*>
 bool Asserter::getParam(const ros::NodeHandle& nh, const std::string& param_name, T& param_var,
-              std::vector<NumberAssertionType> assertions) const
+                        std::vector<NumberAssertionType> assertions) const
 {
   if (getParam(nh, param_name, param_var))
   {
@@ -77,9 +78,10 @@ bool Asserter::getParam(const ros::NodeHandle& nh, const std::string& param_name
 
 template <typename T, typename type_traits::disable_if<type_traits::is_number<T>::value, T>::type*>
 bool Asserter::getParam(const ros::NodeHandle& nh, const std::string& param_name, T& param_var,
-              std::vector<NumberAssertionType> assertions) const
+                        std::vector<NumberAssertionType> assertions) const
 {
-  ROS_WARN_STREAM("[" << nh.getNamespace() << "] An assertion was set for " << param_name << " but it is not a number. Continuing without assertions.");
+  ROS_WARN_STREAM("[" << nh.getNamespace() << "] An assertion was set for " << param_name
+                      << " but it is not a number. Continuing without assertions.");
 
   return getParam(nh, param_name, param_var);
 }
@@ -153,7 +155,8 @@ template void Asserter::warnDefaultWithMessage(const std::string& node_namespace
 template void Asserter::warnDefaultWithMessage(const std::string& node_namespace, const std::string& variable_name,
                                                const bool& variable, const std::string& message) const;
 template void Asserter::warnDefaultWithMessage(const std::string& node_namespace, const std::string& variable_name,
-                                               const std::vector<std::string>& variable, const std::string& message) const;
+                                               const std::vector<std::string>& variable,
+                                               const std::string& message) const;
 template void Asserter::warnDefaultWithMessage(const std::string& node_namespace, const std::string& variable_name,
                                                const std::vector<double>& variable, const std::string& message) const;
 template void Asserter::warnDefaultWithMessage(const std::string& node_namespace, const std::string& variable_name,
@@ -163,48 +166,82 @@ template void Asserter::warnDefaultWithMessage(const std::string& node_namespace
 template void Asserter::warnDefaultWithMessage(const std::string& node_namespace, const std::string& variable_name,
                                                const std::vector<bool>& variable, const std::string& message) const;
 
-template bool Asserter::getParam(const ros::NodeHandle& nh, const std::string& param_name, std::string& param_var) const;
+template bool Asserter::getParam(const ros::NodeHandle& nh, const std::string& param_name,
+                                 std::string& param_var) const;
 template bool Asserter::getParam(const ros::NodeHandle& nh, const std::string& param_name, double& param_var) const;
 template bool Asserter::getParam(const ros::NodeHandle& nh, const std::string& param_name, float& param_var) const;
 template bool Asserter::getParam(const ros::NodeHandle& nh, const std::string& param_name, int& param_var) const;
 template bool Asserter::getParam(const ros::NodeHandle& nh, const std::string& param_name, bool& param_var) const;
-template bool Asserter::getParam(const ros::NodeHandle& nh, const std::string& param_name, std::vector<std::string>& param_var) const;
-template bool Asserter::getParam(const ros::NodeHandle& nh, const std::string& param_name, std::vector<double>& param_var) const;
-template bool Asserter::getParam(const ros::NodeHandle& nh, const std::string& param_name, std::vector<float>& param_var) const;
-template bool Asserter::getParam(const ros::NodeHandle& nh, const std::string& param_name, std::vector<int>& param_var) const;
-template bool Asserter::getParam(const ros::NodeHandle& nh, const std::string& param_name, std::vector<bool>& param_var) const;
+template bool Asserter::getParam(const ros::NodeHandle& nh, const std::string& param_name,
+                                 std::vector<std::string>& param_var) const;
+template bool Asserter::getParam(const ros::NodeHandle& nh, const std::string& param_name,
+                                 std::vector<double>& param_var) const;
+template bool Asserter::getParam(const ros::NodeHandle& nh, const std::string& param_name,
+                                 std::vector<float>& param_var) const;
+template bool Asserter::getParam(const ros::NodeHandle& nh, const std::string& param_name,
+                                 std::vector<int>& param_var) const;
+template bool Asserter::getParam(const ros::NodeHandle& nh, const std::string& param_name,
+                                 std::vector<bool>& param_var) const;
 
-template bool Asserter::getParam(const ros::NodeHandle& nh, const std::string& param_name, std::string& param_var, std::vector<NumberAssertionType> assertions) const;
-template bool Asserter::getParam(const ros::NodeHandle& nh, const std::string& param_name, double& param_var, std::vector<NumberAssertionType> assertions) const;
-template bool Asserter::getParam(const ros::NodeHandle& nh, const std::string& param_name, float& param_var, std::vector<NumberAssertionType> assertions) const;
-template bool Asserter::getParam(const ros::NodeHandle& nh, const std::string& param_name, int& param_var, std::vector<NumberAssertionType> assertions) const;
-template bool Asserter::getParam(const ros::NodeHandle& nh, const std::string& param_name, bool& param_var, std::vector<NumberAssertionType> assertions) const;
-template bool Asserter::getParam(const ros::NodeHandle& nh, const std::string& param_name, std::vector<std::string>& param_var, std::vector<NumberAssertionType> assertions) const;
-template bool Asserter::getParam(const ros::NodeHandle& nh, const std::string& param_name, std::vector<double>& param_var, std::vector<NumberAssertionType> assertions) const;
-template bool Asserter::getParam(const ros::NodeHandle& nh, const std::string& param_name, std::vector<float>& param_var, std::vector<NumberAssertionType> assertions) const;
-template bool Asserter::getParam(const ros::NodeHandle& nh, const std::string& param_name, std::vector<int>& param_var, std::vector<NumberAssertionType> assertions) const;
-template bool Asserter::getParam(const ros::NodeHandle& nh, const std::string& param_name, std::vector<bool>& param_var, std::vector<NumberAssertionType> assertions) const;
+template bool Asserter::getParam(const ros::NodeHandle& nh, const std::string& param_name, std::string& param_var,
+                                 std::vector<NumberAssertionType> assertions) const;
+template bool Asserter::getParam(const ros::NodeHandle& nh, const std::string& param_name, double& param_var,
+                                 std::vector<NumberAssertionType> assertions) const;
+template bool Asserter::getParam(const ros::NodeHandle& nh, const std::string& param_name, float& param_var,
+                                 std::vector<NumberAssertionType> assertions) const;
+template bool Asserter::getParam(const ros::NodeHandle& nh, const std::string& param_name, int& param_var,
+                                 std::vector<NumberAssertionType> assertions) const;
+template bool Asserter::getParam(const ros::NodeHandle& nh, const std::string& param_name, bool& param_var,
+                                 std::vector<NumberAssertionType> assertions) const;
+template bool Asserter::getParam(const ros::NodeHandle& nh, const std::string& param_name,
+                                 std::vector<std::string>& param_var,
+                                 std::vector<NumberAssertionType> assertions) const;
+template bool Asserter::getParam(const ros::NodeHandle& nh, const std::string& param_name,
+                                 std::vector<double>& param_var, std::vector<NumberAssertionType> assertions) const;
+template bool Asserter::getParam(const ros::NodeHandle& nh, const std::string& param_name,
+                                 std::vector<float>& param_var, std::vector<NumberAssertionType> assertions) const;
+template bool Asserter::getParam(const ros::NodeHandle& nh, const std::string& param_name, std::vector<int>& param_var,
+                                 std::vector<NumberAssertionType> assertions) const;
+template bool Asserter::getParam(const ros::NodeHandle& nh, const std::string& param_name, std::vector<bool>& param_var,
+                                 std::vector<NumberAssertionType> assertions) const;
 
-template bool Asserter::param(const ros::NodeHandle& nh, const std::string& param_name, std::string& param_var, const std::string& default_val) const;
-template bool Asserter::param(const ros::NodeHandle& nh, const std::string& param_name, double& param_var, const double& default_val) const;
-template bool Asserter::param(const ros::NodeHandle& nh, const std::string& param_name, float& param_var, const float& default_val) const;
-template bool Asserter::param(const ros::NodeHandle& nh, const std::string& param_name, int& param_var, const int& default_val) const;
-template bool Asserter::param(const ros::NodeHandle& nh, const std::string& param_name, bool& param_var, const bool& default_val) const;
-template bool Asserter::param(const ros::NodeHandle& nh, const std::string& param_name, std::vector<std::string>& param_var, const std::vector<std::string>& default_val) const;
-template bool Asserter::param(const ros::NodeHandle& nh, const std::string& param_name, std::vector<double>& param_var, const std::vector<double>& default_val) const;
-template bool Asserter::param(const ros::NodeHandle& nh, const std::string& param_name, std::vector<float>& param_var, const std::vector<float>& default_val) const;
-template bool Asserter::param(const ros::NodeHandle& nh, const std::string& param_name, std::vector<int>& param_var, const std::vector<int>& default_val) const;
-template bool Asserter::param(const ros::NodeHandle& nh, const std::string& param_name, std::vector<bool>& param_var, const std::vector<bool>& default_val) const;
+template bool Asserter::param(const ros::NodeHandle& nh, const std::string& param_name, std::string& param_var,
+                              const std::string& default_val) const;
+template bool Asserter::param(const ros::NodeHandle& nh, const std::string& param_name, double& param_var,
+                              const double& default_val) const;
+template bool Asserter::param(const ros::NodeHandle& nh, const std::string& param_name, float& param_var,
+                              const float& default_val) const;
+template bool Asserter::param(const ros::NodeHandle& nh, const std::string& param_name, int& param_var,
+                              const int& default_val) const;
+template bool Asserter::param(const ros::NodeHandle& nh, const std::string& param_name, bool& param_var,
+                              const bool& default_val) const;
+template bool Asserter::param(const ros::NodeHandle& nh, const std::string& param_name,
+                              std::vector<std::string>& param_var, const std::vector<std::string>& default_val) const;
+template bool Asserter::param(const ros::NodeHandle& nh, const std::string& param_name, std::vector<double>& param_var,
+                              const std::vector<double>& default_val) const;
+template bool Asserter::param(const ros::NodeHandle& nh, const std::string& param_name, std::vector<float>& param_var,
+                              const std::vector<float>& default_val) const;
+template bool Asserter::param(const ros::NodeHandle& nh, const std::string& param_name, std::vector<int>& param_var,
+                              const std::vector<int>& default_val) const;
+template bool Asserter::param(const ros::NodeHandle& nh, const std::string& param_name, std::vector<bool>& param_var,
+                              const std::vector<bool>& default_val) const;
 
-template std::string Asserter::param(const ros::NodeHandle& nh, const std::string& param_name, const std::string& default_val) const;
-template double Asserter::param(const ros::NodeHandle& nh, const std::string& param_name, const double& default_val) const;
-template float Asserter::param(const ros::NodeHandle& nh, const std::string& param_name, const float& default_val) const;
+template std::string Asserter::param(const ros::NodeHandle& nh, const std::string& param_name,
+                                     const std::string& default_val) const;
+template double Asserter::param(const ros::NodeHandle& nh, const std::string& param_name,
+                                const double& default_val) const;
+template float Asserter::param(const ros::NodeHandle& nh, const std::string& param_name,
+                               const float& default_val) const;
 template int Asserter::param(const ros::NodeHandle& nh, const std::string& param_name, const int& default_val) const;
 template bool Asserter::param(const ros::NodeHandle& nh, const std::string& param_name, const bool& default_val) const;
-template std::vector<std::string> Asserter::param(const ros::NodeHandle& nh, const std::string& param_name, const std::vector<std::string>& default_val) const;
-template std::vector<double> Asserter::param(const ros::NodeHandle& nh, const std::string& param_name, const std::vector<double>& default_val) const;
-template std::vector<float> Asserter::param(const ros::NodeHandle& nh, const std::string& param_name, const std::vector<float>& default_val) const;
-template std::vector<int> Asserter::param(const ros::NodeHandle& nh, const std::string& param_name, const std::vector<int>& default_val) const;
-template std::vector<bool> Asserter::param(const ros::NodeHandle& nh, const std::string& param_name, const std::vector<bool>& default_val) const;
-}
-
+template std::vector<std::string> Asserter::param(const ros::NodeHandle& nh, const std::string& param_name,
+                                                  const std::vector<std::string>& default_val) const;
+template std::vector<double> Asserter::param(const ros::NodeHandle& nh, const std::string& param_name,
+                                             const std::vector<double>& default_val) const;
+template std::vector<float> Asserter::param(const ros::NodeHandle& nh, const std::string& param_name,
+                                            const std::vector<float>& default_val) const;
+template std::vector<int> Asserter::param(const ros::NodeHandle& nh, const std::string& param_name,
+                                          const std::vector<int>& default_val) const;
+template std::vector<bool> Asserter::param(const ros::NodeHandle& nh, const std::string& param_name,
+                                           const std::vector<bool>& default_val) const;
+}  // namespace assertions
