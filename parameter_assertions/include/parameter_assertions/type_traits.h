@@ -1,6 +1,9 @@
 #ifndef SRC_TYPE_TRAITS_H
 #define SRC_TYPE_TRAITS_H
 
+#include <vector>
+#include <type_traits>
+
 namespace assertions::type_traits
 {
 template <bool B, typename T = void>

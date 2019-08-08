@@ -3,7 +3,6 @@
 
 #include <parameter_assertions/type_traits.h>
 #include <ros/ros.h>
-#include <type_traits>
 
 namespace assertions
 {
