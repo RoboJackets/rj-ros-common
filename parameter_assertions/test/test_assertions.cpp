@@ -70,13 +70,13 @@ protected:
 #define EXPECT_ROS_ALIVE()                                                                                             \
   do                                                                                                                   \
   {                                                                                                                    \
-    EXPECT_FALSE(ros::isShuttingDown());                                                                               \
+    EXPECT_TRUE(ros::ok());                                                                                            \
   } while (false)
 
 #define EXPECT_ROS_DEAD()                                                                                              \
   do                                                                                                                   \
   {                                                                                                                    \
-    EXPECT_TRUE(ros::isShuttingDown());                                                                                \
+    EXPECT_FALSE(ros::ok());                                                                                           \
   } while (false)
 
 //========== Basic Functionality ==========
