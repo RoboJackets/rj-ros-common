@@ -3,8 +3,7 @@ dir: &dir
 
 image: &image
   docker:
-    - image: ros:melodic
-#  - image: robojackets/rj-ros-common-baseimage:latest
+    - image: robojackets/rj-ros-common:latest
 
 checkout: &checkout
   checkout:
