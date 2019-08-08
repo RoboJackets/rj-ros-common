@@ -70,11 +70,11 @@ public:
 
   template <typename T, typename std::enable_if<type_traits::is_number<T>::value, T>::type* = nullptr>
   bool getParam(const ros::NodeHandle& nh, const std::string& param_name, T& param_var,
-                std::vector<NumberAssertionType> assertions) const;
+                const std::vector<NumberAssertionType>& assertions) const;
 
   template <typename T, typename type_traits::disable_if<type_traits::is_number<T>::value, T>::type* = nullptr>
   bool getParam(const ros::NodeHandle& nh, const std::string& param_name, T& param_var,
-                std::vector<NumberAssertionType> assertions) const;
+                const std::vector<NumberAssertionType>& assertions) const;
 
 private:
   template <typename T, typename type_traits::disable_if<type_traits::is_vector<T>::value, T>::type* = nullptr>
@@ -86,7 +86,7 @@ private:
                               const std::string& message) const;
 
   template <typename T, typename type_traits::disable_if<type_traits::is_vector<T>::value, T>::type* = nullptr>
-  bool passesAssertion(const T& variable, std::vector<NumberAssertionType> assertions) const;
+  bool passesAssertion(const T& variable, const std::vector<NumberAssertionType>& assertions) const;
 
   template <typename V, typename std::enable_if<type_traits::is_vector<V>::value, V>::type* = nullptr>
   bool passesAssertion(const V& variable, std::vector<NumberAssertionType> assertions) const;
