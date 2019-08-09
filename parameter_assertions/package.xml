@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package format="2">
   <name>parameter_assertions</name>
-  <version>0.0.0</version>
+  <version>0.1.0</version>
   <description>A library for ROS parameter assertions</description>
 
   <maintainer email="oswinso@gmail.com">Oswin So</maintainer>
