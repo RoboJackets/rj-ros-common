@@ -22,6 +22,11 @@ struct is_vector<std::vector<T, A>> : public std::true_type
 {
 };
 
+template <typename T, typename A>
+struct is_vector<const std::vector<T, A>> : public std::true_type
+{
+};
+
 template <typename T>
 struct is_number : public std::false_type
 {
