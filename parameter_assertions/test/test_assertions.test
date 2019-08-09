@@ -1,3 +1,0 @@
-<launch>
-  <test test-name="test_assertions" pkg="parameter_assertions" type="test_assertions"/>
-</launch>
