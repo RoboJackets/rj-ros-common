@@ -59,6 +59,7 @@ bool Asserter::getParam(const ros::NodeHandle& nh, const std::string& param_name
 {
   if (!nh.getParam(param_name, param_var))
   {
+    ROS_ERROR_STREAM("[" << nh.getNamespace() << "] " << param_name << " is not set. Exiting...");
     fail();
     return false;
   }
@@ -74,6 +75,7 @@ bool Asserter::getParam(const ros::NodeHandle& nh, const std::string& param_name
   {
     if (!passesAssertion(param_var, assertions))
     {
+      ROS_ERROR_STREAM("[" << nh.getNamespace() << "] " << param_name << " is not set. Exiting...");
       fail();
       return false;
     }
