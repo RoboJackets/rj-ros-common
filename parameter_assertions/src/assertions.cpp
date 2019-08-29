@@ -52,7 +52,7 @@ template <typename T>
 constexpr bool enable_fallback = !type_traits::is_vector<T>::value && !std::is_arithmetic<T>::value;
 
 template <typename T, typename std::enable_if<enable_fallback<T>, T>::type* = nullptr>
-void warnDefaultWithMessage(const std::string& node_namespace, const std::string& variable_name, T& /* variable */,
+void warnDefaultWithMessage(const std::string& node_namespace, const std::string& variable_name, const T& /* unused */,
                             const std::string& message)
 {
   std::string variable_str = "<non-printable value>";
