@@ -33,7 +33,7 @@ void warnDefaultWithMessage(const std::string& node_namespace, const std::string
 }
 
 template <typename T, typename std::enable_if<std::is_arithmetic<T>::value, T>::type* = nullptr>
-void warnDefaultWithMessage(const std::string& node_namespace, const std::string& variable_name, T& variable,
+void warnDefaultWithMessage(const std::string& node_namespace, const std::string& variable_name, const T& variable,
                             const std::string& message)
 {
   std::string variable_str = std::to_string(variable);
@@ -41,7 +41,7 @@ void warnDefaultWithMessage(const std::string& node_namespace, const std::string
 }
 
 template <typename T, typename std::enable_if<type_traits::is_vector<T>::value, T>::type* = nullptr>
-void warnDefaultWithMessage(const std::string& node_namespace, const std::string& variable_name, T& variable,
+void warnDefaultWithMessage(const std::string& node_namespace, const std::string& variable_name, const T& variable,
                             const std::string& message)
 {
   std::string variable_str = vectorToString(variable);
@@ -51,7 +51,7 @@ void warnDefaultWithMessage(const std::string& node_namespace, const std::string
 template <typename T>
 constexpr bool enable_fallback = !type_traits::is_vector<T>::value && !std::is_arithmetic<T>::value;
 
-template <typename T, typename std::enable_if_t<enable_fallback<T>, T>* = nullptr>
+template <typename T, typename std::enable_if<enable_fallback<T>, T>::type* = nullptr>
 void warnDefaultWithMessage(const std::string& node_namespace, const std::string& variable_name, T& /* variable */,
                             const std::string& message)
 {
@@ -119,7 +119,7 @@ template <typename T> Assertion<T> less_eq(const T& rhs) {
   return Assertion<T>([&rhs](const T& lhs) { return lhs <= rhs; }, "x <= " + std::to_string(rhs));
 }
 
-template <typename T> Assertion<T> n_elements(size_t n) {
+template <typename T> Assertion<T> size(size_t n) {
   return Assertion<T>([n](const T& c) { return c.size() == n; }, "container.size() = " + std::to_string(n));
 }
 
@@ -156,7 +156,7 @@ bool param(const ros::NodeHandle& nh, const std::string& param_name, T& param_va
     }
     else
     {
-      ROS_WARN_STREAM("[" << nh.getNamespace() << "] " << *message << " Continuing with default parameter.");
+      ROS_WARN_STREAM("[" << nh.getNamespace() << "] " << *message << ". Continuing with default parameter.");
     }
   }
 
@@ -164,9 +164,9 @@ bool param(const ros::NodeHandle& nh, const std::string& param_name, T& param_va
   auto message = getErrorMessage(param_var, assertions);
   if (!message)
   {
-    return true;
+    return false;
   }
-  ROS_ERROR_STREAM("[" << nh.getNamespace() << "] " << *message << " Exiting...");
+  ROS_ERROR_STREAM("[" << nh.getNamespace() << "] " << *message << ". Exiting...");
   fail();
 
   return false;
@@ -232,7 +232,7 @@ bool getParam(const ros::NodeHandle& nh, const std::string& param_name, T& param
   {
     if (auto message = getErrorMessage(param_var, assertions))
     {
-      ROS_ERROR_STREAM("[" << nh.getNamespace() << "] " << *message << " Exiting...");
+      ROS_ERROR_STREAM("[" << nh.getNamespace() << "] " << *message << ". Exiting...");
       fail();
       return false;
     }
@@ -263,6 +263,8 @@ bool getParam(const ros::NodeHandle& nh, const std::string& param_name, T& param
 }
 
 
+// *********************** generate templated code *************************** //
+
 #define __DEFINE_TEMPLATES_NOASSERT(T) \
   template bool getParam(const ros::NodeHandle& nh, const std::string& param_name, T& param_var); \
   template bool param(const ros::NodeHandle& nh, const std::string& param_name, T& param_val, const T& default_val); \
@@ -278,34 +280,42 @@ bool getParam(const ros::NodeHandle& nh, const std::string& param_name, T& param
 
 #define SINGLE_ARG(...) __VA_ARGS__
 
-#define __DEFINE_TEMPLATES_NONNUMERIC(T) \
+#define __DEFINE_TEMPLATES_GENERAL(T) \
   __DEFINE_TEMPLATES_NOASSERT(SINGLE_ARG(T)) \
   __DEFINE_TEMPLATES_ASSERT(SINGLE_ARG(T), Assertion<SINGLE_ARG(T)>)
 
 #define __DEFINE_TEMPLATES_NUMERIC(T) \
-  __DEFINE_TEMPLATES_NONNUMERIC(SINGLE_ARG(T)) \
-  __DEFINE_TEMPLATES_ASSERT(SINGLE_ARG(T), NumberAssertionType)
+  __DEFINE_TEMPLATES_GENERAL(SINGLE_ARG(T)) \
+  __DEFINE_TEMPLATES_ASSERT(SINGLE_ARG(T), NumberAssertionType) \
+  template Assertion<T> greater(const T& rhs); \
+  template Assertion<T> greater_eq(const T& rhs); \
+  template Assertion<T> less(const T& rhs); \
+  template Assertion<T> less_eq(const T& rhs);
 
-__DEFINE_TEMPLATES_NONNUMERIC(std::string)
-__DEFINE_TEMPLATES_NONNUMERIC(std::vector<std::string>)
-__DEFINE_TEMPLATES_NONNUMERIC(SINGLE_ARG(std::map<std::string, std::string>))
+#define __DEFINE_TEMPLATES_CONTAINER(T) \
+  __DEFINE_TEMPLATES_GENERAL(SINGLE_ARG(T)) \
+  template Assertion<T> size(size_t n);
 
-__DEFINE_TEMPLATES_NONNUMERIC(bool)
-__DEFINE_TEMPLATES_NONNUMERIC(std::vector<bool>)
-__DEFINE_TEMPLATES_NONNUMERIC(SINGLE_ARG(std::map<std::string, bool>))
+__DEFINE_TEMPLATES_CONTAINER(std::string)
+__DEFINE_TEMPLATES_CONTAINER(std::vector<std::string>)
+__DEFINE_TEMPLATES_CONTAINER(SINGLE_ARG(std::map<std::string, std::string>))
+
+__DEFINE_TEMPLATES_GENERAL(bool)
+__DEFINE_TEMPLATES_CONTAINER(std::vector<bool>)
+__DEFINE_TEMPLATES_CONTAINER(SINGLE_ARG(std::map<std::string, bool>))
 
 __DEFINE_TEMPLATES_NUMERIC(double)
-__DEFINE_TEMPLATES_NUMERIC(std::vector<double>)
-__DEFINE_TEMPLATES_NUMERIC(SINGLE_ARG(std::map<std::string, double>))
+__DEFINE_TEMPLATES_CONTAINER(std::vector<double>)
+__DEFINE_TEMPLATES_CONTAINER(SINGLE_ARG(std::map<std::string, double>))
 
 __DEFINE_TEMPLATES_NUMERIC(float)
-__DEFINE_TEMPLATES_NUMERIC(std::vector<float>)
-__DEFINE_TEMPLATES_NUMERIC(SINGLE_ARG(std::map<std::string, float>))
+__DEFINE_TEMPLATES_CONTAINER(std::vector<float>)
+__DEFINE_TEMPLATES_CONTAINER(SINGLE_ARG(std::map<std::string, float>))
 
 __DEFINE_TEMPLATES_NUMERIC(int)
-__DEFINE_TEMPLATES_NUMERIC(std::vector<int>)
-__DEFINE_TEMPLATES_NUMERIC(SINGLE_ARG(std::map<std::string, int>))
+__DEFINE_TEMPLATES_CONTAINER(std::vector<int>)
+__DEFINE_TEMPLATES_CONTAINER(SINGLE_ARG(std::map<std::string, int>))
 
-__DEFINE_TEMPLATES_NONNUMERIC(XmlRpc::XmlRpcValue)
+__DEFINE_TEMPLATES_GENERAL(XmlRpc::XmlRpcValue)
 
 }  // namespace assertions

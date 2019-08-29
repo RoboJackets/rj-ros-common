@@ -79,7 +79,7 @@ Assertion<T> less_eq(const T& rhs);
  * @return
  */
 template <typename T>
-Assertion<T> n_elements(size_t n);
+Assertion<T> size(size_t n);
 
 
 /**
