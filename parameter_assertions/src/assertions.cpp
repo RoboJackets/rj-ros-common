@@ -165,7 +165,8 @@ bool param(const ros::NodeHandle& nh, const std::string& param_name, T& param_va
     }
     else
     {
-      ROS_WARN_STREAM("[" << nh.getNamespace() << "] " << *message << ". Continuing with default parameter.");
+      ROS_WARN_STREAM("[" << nh.getNamespace() << "] " << param_name << " expects " << *message
+          << ". Continuing with default parameter.");
     }
   }
 
@@ -175,7 +176,7 @@ bool param(const ros::NodeHandle& nh, const std::string& param_name, T& param_va
   {
     return false;
   }
-  ROS_ERROR_STREAM("[" << nh.getNamespace() << "] " << *message << ". Exiting...");
+  ROS_ERROR_STREAM("[" << nh.getNamespace() << "] " << param_name << " expects " << *message << ". Exiting...");
   fail();
 
   return false;
@@ -242,7 +243,8 @@ bool getParam(const ros::NodeHandle& nh, const std::string& param_name, T& param
   {
     if (auto message = getErrorMessage(param_var, assertions))
     {
-      ROS_ERROR_STREAM("[" << nh.getNamespace() << "] " << *message << ". Exiting...");
+      ROS_ERROR_STREAM("[" << nh.getNamespace() << "] " << param_name << " expects " << *message
+          << ". Exiting...");
       fail();
       return false;
     }
