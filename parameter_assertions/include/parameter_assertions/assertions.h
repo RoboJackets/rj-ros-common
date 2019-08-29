@@ -22,7 +22,8 @@ enum class NumberAssertionType
  * @tparam T Type for the argument of the assertion predicate
  */
 template <typename T>
-struct Assertion {
+struct Assertion
+{
   std::function<bool(const T&)> predicate;
   std::string expectation;
 
@@ -33,7 +34,9 @@ struct Assertion {
    * @param expectation a string explaining the expected case, to be shown when the predicate evaluates to false
    */
   Assertion(std::function<bool(const T&)> predicate, std::string expectation)
-      : predicate(predicate), expectation(std::move(expectation)) {}
+    : predicate(predicate), expectation(std::move(expectation))
+  {
+  }
 };
 
 /**
@@ -80,7 +83,6 @@ Assertion<T> less_eq(const T& rhs);
  */
 template <typename T>
 Assertion<T> size(size_t n);
-
 
 /**
  * Calls nh.param with the passed in values. Logs with ROS_WARN_STREAM if the default value is used. Returns the

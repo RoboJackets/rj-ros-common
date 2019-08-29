@@ -75,8 +75,8 @@ Assertion<T> getNumericAssertion(NumberAssertionType assertion_type, const T& va
     case NumberAssertionType::LESS_THAN_EQ_ONE:
       return { [](const T& param) { return param <= 1; }, std::to_string(variable) + " must be <= 1." };
     case NumberAssertionType::ABS_LESS_THAN_EQ_ONE:
-      return { [](const T& param) { return std::abs(param) <= 1; },
-               std::to_string(variable) + " must have an absolute value <= 1." };
+      return { [](const T& param) { return std::abs(param) <= 1; }, std::to_string(variable) + " must have an absolute "
+                                                                                               "value <= 1." };
     default:
       ROS_ERROR_STREAM("default case reached in getNumericAssertion even though match was exhaustive");
       return { [](const T& /*param*/) { return false; }, "valid NumberAssertionType" };
