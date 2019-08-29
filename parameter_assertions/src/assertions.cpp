@@ -65,28 +65,28 @@ Assertion<T> getNumericAssertion(NumberAssertionType assertion_type, const T& va
   switch (assertion_type)
   {
     case NumberAssertionType::POSITIVE:
-      return {[](const T& param) { return param > 0; }, std::to_string(variable) + " must be > 0."};
+      return { [](const T& param) { return param > 0; }, std::to_string(variable) + " must be > 0." };
     case NumberAssertionType::NON_NEGATIVE:
-      return {[](const T& param) { return param >= 0; }, std::to_string(variable) + " must be >= 0."};
+      return { [](const T& param) { return param >= 0; }, std::to_string(variable) + " must be >= 0." };
     case NumberAssertionType::NEGATIVE:
-      return {[](const T& param) { return param < 0; }, std::to_string(variable) + " must be < 0."};
+      return { [](const T& param) { return param < 0; }, std::to_string(variable) + " must be < 0." };
     case NumberAssertionType::NON_POSITIVE:
-      return {[](const T& param) { return param <= 0; }, std::to_string(variable) + " must be <= 0."};
+      return { [](const T& param) { return param <= 0; }, std::to_string(variable) + " must be <= 0." };
     case NumberAssertionType::LESS_THAN_EQ_ONE:
-      return {[](const T& param) { return param <= 1; }, std::to_string(variable) + " must be <= 1."};
+      return { [](const T& param) { return param <= 1; }, std::to_string(variable) + " must be <= 1." };
     case NumberAssertionType::ABS_LESS_THAN_EQ_ONE:
-      return {[](const T& param) { return std::abs(param) <= 1; },
-              std::to_string(variable) + " must have an absolute value <= 1."};
+      return { [](const T& param) { return std::abs(param) <= 1; },
+               std::to_string(variable) + " must have an absolute value <= 1." };
     default:
       ROS_ERROR_STREAM("default case reached in getNumericAssertion even though match was exhaustive");
-      return {[](const T& /*param*/) { return false; }, "valid NumberAssertionType"};
+      return { [](const T& /*param*/) { return false; }, "valid NumberAssertionType" };
   }
 }
 
 template <typename T>
 std::optional<std::string> getErrorMessage(const T& variable, const std::vector<Assertion<T>>& assertions)
 {
-  for (const Assertion<T>& assertion: assertions)
+  for (const Assertion<T>& assertion : assertions)
   {
     if (!assertion.predicate(variable))
     {
@@ -103,26 +103,35 @@ void fail()
 
 }  // namespace
 
-template <typename T> Assertion<T> greater(const T& rhs) {
+template <typename T>
+Assertion<T> greater(const T& rhs)
+{
   return Assertion<T>([&rhs](const T& lhs) { return lhs > rhs; }, "x > " + std::to_string(rhs));
 }
 
-template <typename T> Assertion<T> greater_eq(const T& rhs) {
+template <typename T>
+Assertion<T> greater_eq(const T& rhs)
+{
   return Assertion<T>([&rhs](const T& lhs) { return lhs >= rhs; }, "x >= " + std::to_string(rhs));
 }
 
-template <typename T> Assertion<T> less(const T& rhs) {
+template <typename T>
+Assertion<T> less(const T& rhs)
+{
   return Assertion<T>([&rhs](const T& lhs) { return lhs < rhs; }, "x < " + std::to_string(rhs));
 }
 
-template <typename T> Assertion<T> less_eq(const T& rhs) {
+template <typename T>
+Assertion<T> less_eq(const T& rhs)
+{
   return Assertion<T>([&rhs](const T& lhs) { return lhs <= rhs; }, "x <= " + std::to_string(rhs));
 }
 
-template <typename T> Assertion<T> size(size_t n) {
+template <typename T>
+Assertion<T> size(size_t n)
+{
   return Assertion<T>([n](const T& c) { return c.size() == n; }, "container.size() = " + std::to_string(n));
 }
-
 
 template <typename T>
 bool param(const ros::NodeHandle& nh, const std::string& param_name, T& param_var, const T& default_val)
@@ -177,7 +186,8 @@ bool param(const ros::NodeHandle& nh, const std::string& param_name, T& param_va
            const std::vector<NumberAssertionType>& numeric_assertions)
 {
   std::vector<Assertion<T>> assertions;
-  for (auto numeric_assertion : numeric_assertions) {
+  for (auto numeric_assertion : numeric_assertions)
+  {
     assertions.push_back(getNumericAssertion(numeric_assertion, param_var));
   }
   return param(nh, param_name, param_var, default_val, assertions);
@@ -246,7 +256,8 @@ bool getParam(const ros::NodeHandle& nh, const std::string& param_name, T& param
               const std::vector<NumberAssertionType>& numeric_assertions)
 {
   std::vector<Assertion<T>> assertions;
-  for (auto numeric_assertion : numeric_assertions) {
+  for (auto numeric_assertion : numeric_assertions)
+  {
     assertions.push_back(getNumericAssertion(numeric_assertion, param_var));
   }
   return getParam(nh, param_name, param_var, assertions);
@@ -262,38 +273,37 @@ bool getParam(const ros::NodeHandle& nh, const std::string& param_name, T& param
   return getParam(nh, param_name, param_var);
 }
 
-
 // *********************** generate templated code *************************** //
 
-#define __DEFINE_TEMPLATES_NOASSERT(T) \
-  template bool getParam(const ros::NodeHandle& nh, const std::string& param_name, T& param_var); \
-  template bool param(const ros::NodeHandle& nh, const std::string& param_name, T& param_val, const T& default_val); \
+#define __DEFINE_TEMPLATES_NOASSERT(T)                                                                                 \
+  template bool getParam(const ros::NodeHandle& nh, const std::string& param_name, T& param_var);                      \
+  template bool param(const ros::NodeHandle& nh, const std::string& param_name, T& param_val, const T& default_val);   \
   template T param(const ros::NodeHandle& nh, const std::string& param_name, const T& default_val);
 
-#define __DEFINE_TEMPLATES_ASSERT(T, A) \
-  template bool getParam(const ros::NodeHandle& nh, const std::string& param_name, T& param_var, \
-                         const std::vector<A>& assertions); \
-  template bool param(const ros::NodeHandle& nh, const std::string& param_name, T& param_val, const T& default_val, \
-                      const std::vector<A>& assertions); \
-  template T param(const ros::NodeHandle& nh, const std::string& param_name, const T& default_val, \
+#define __DEFINE_TEMPLATES_ASSERT(T, A)                                                                                \
+  template bool getParam(const ros::NodeHandle& nh, const std::string& param_name, T& param_var,                       \
+                         const std::vector<A>& assertions);                                                            \
+  template bool param(const ros::NodeHandle& nh, const std::string& param_name, T& param_val, const T& default_val,    \
+                      const std::vector<A>& assertions);                                                               \
+  template T param(const ros::NodeHandle& nh, const std::string& param_name, const T& default_val,                     \
                    const std::vector<A>& assertions);
 
 #define SINGLE_ARG(...) __VA_ARGS__
 
-#define __DEFINE_TEMPLATES_GENERAL(T) \
-  __DEFINE_TEMPLATES_NOASSERT(SINGLE_ARG(T)) \
+#define __DEFINE_TEMPLATES_GENERAL(T)                                                                                  \
+  __DEFINE_TEMPLATES_NOASSERT(SINGLE_ARG(T))                                                                           \
   __DEFINE_TEMPLATES_ASSERT(SINGLE_ARG(T), Assertion<SINGLE_ARG(T)>)
 
-#define __DEFINE_TEMPLATES_NUMERIC(T) \
-  __DEFINE_TEMPLATES_GENERAL(SINGLE_ARG(T)) \
-  __DEFINE_TEMPLATES_ASSERT(SINGLE_ARG(T), NumberAssertionType) \
-  template Assertion<T> greater(const T& rhs); \
-  template Assertion<T> greater_eq(const T& rhs); \
-  template Assertion<T> less(const T& rhs); \
+#define __DEFINE_TEMPLATES_NUMERIC(T)                                                                                  \
+  __DEFINE_TEMPLATES_GENERAL(SINGLE_ARG(T))                                                                            \
+  __DEFINE_TEMPLATES_ASSERT(SINGLE_ARG(T), NumberAssertionType)                                                        \
+  template Assertion<T> greater(const T& rhs);                                                                         \
+  template Assertion<T> greater_eq(const T& rhs);                                                                      \
+  template Assertion<T> less(const T& rhs);                                                                            \
   template Assertion<T> less_eq(const T& rhs);
 
-#define __DEFINE_TEMPLATES_CONTAINER(T) \
-  __DEFINE_TEMPLATES_GENERAL(SINGLE_ARG(T)) \
+#define __DEFINE_TEMPLATES_CONTAINER(T)                                                                                \
+  __DEFINE_TEMPLATES_GENERAL(SINGLE_ARG(T))                                                                            \
   template Assertion<T> size(size_t n);
 
 __DEFINE_TEMPLATES_CONTAINER(std::string)
