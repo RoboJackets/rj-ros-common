@@ -11,3 +11,6 @@ target_link_libraries(test_getParam_with_assertions ${PARAMETER_ASSERTIONS_TEST_
 
 add_rostest_gtest(test_param_with_assertions test_param_with_assertions.test test_param_with_assertions.cpp)
 target_link_libraries(test_param_with_assertions ${PARAMETER_ASSERTIONS_TEST_LIBRARIES})
+
+add_rostest_gtest(test_complex_datatypes test_complex_datatypes.test test_complex_datatypes.cpp)
+target_link_libraries(test_complex_datatypes ${PARAMETER_ASSERTIONS_TEST_LIBRARIES})
